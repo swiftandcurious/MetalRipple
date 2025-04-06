@@ -4,7 +4,7 @@ Welcome to **MetalRipples**, a code-along project demonstrating how to create cu
 
 The app will look the following:
 
-![[MetalRippleDemo_round.gif]]
+![[MetalRippleDemo_small_round.gif]]
 
 ## Overview
 
