@@ -1,68 +1,96 @@
-# MeshArt
+# Metal: Apple’s Framework That Rocks Your GPU 🤘
 
-MeshArt is a creative code-along project that explores custom visual effects using SwiftUI and Metal. Learn how to create and manipulate mesh gradients—from static backgrounds to interactive, draggable canvases—and apply them to text and shapes to produce stunning visual art.
+Welcome to **MetalRipples**, a code-along project demonstrating how to create custom visual effects with Apple's Metal framework and SwiftUI. In this project, you'll learn how to leverage Metal shaders to produce eye-catching effects such as a dynamic ripple effect and colorful stripes. Whether you're building games, visualizing data, or creating stunning animations, this project shows you how to access your device’s GPU for fast, smooth rendering.
 
-![MeshArt Demo](MeshArtColorDemo-final-small-round.gif)
+The app will look the following:
+
+![[MetalRippleDemo_round.gif]]
 
 ## Overview
 
-Inspired by WWDC24's [Create custom visual effects with SwiftUI](https://developer.apple.com/videos/play/wwdc2024/10151) talk, MeshArt demonstrates:
-- **Static Mesh Gradients:** Define a grid of control points with corresponding colors.
-- **Pride View:** Apply a stripe-based mesh gradient to text, using the colors of the pride flag.
-- **Draggable Mesh Gradient:** Interactively adjust grid points to dynamically alter the gradient, with built-in reset functionality and color pickers.
-- **Reusable Modifiers:** Utilize custom ViewModifiers (like `StripesModifier`) and view extensions for cleaner, reusable code.
-- **Navigation Integration:** Seamlessly integrate multiple views in a `NavigationStack` with custom gesture handling (e.g., disabling the interactive pop gesture).
+This project is divided into two main parts:
 
-## Features
+1. Stripes Shader:
+   A simple Metal shader that produces horizontal color stripes (inspired by the Pride flag). This effect demonstrates how to use custom Metal shaders in SwiftUI to render per-pixel visual effects.
 
-- **Static MeshGradient View:** Quickly set up a 3×3 grid with predetermined control points and colors.
-- **Customizable PrideView:** Easily apply a stripe gradient to text with just a few lines of code.
-- **Interactive DraggableMeshView:** Experiment with moving grid points to see real-time effects on your mesh gradient.
-- **Reusable Stripe Modifier:** Simplify your code by using a custom modifier to apply mesh gradients as stripe effects on any view.
-- **Gesture Handling:** Disable the default interactive pop gesture to ensure smooth dragging of grid points.
-- **Dynamic Color Pickers:** Toggle color pickers on and off to customize gradient colors on the fly.
+2. Ripple Effect: 
+   A more interactive effect that simulates the ripples created by dropping a stone in water. The ripple effect is triggered by user taps on an image. It uses a custom Metal shader combined with SwiftUI animations to create a ripple that propagates outward from the touch point.
 
-## Installation
+## What You'll Explore
+
+- Introduction to Metal:
+  Understand the basics of Metal and how it provides low-level access to the GPU for both graphics and compute tasks.
+
+- Custom Metal Shaders:  
+  Learn how to write and integrate Metal shader code (`.metal` files) with SwiftUI for visual effects.
+
+- SwiftUI & Metal Integration:
+  Discover how to combine SwiftUI animations with Metal shaders using custom view modifiers and keyframe animation.
+
+- User Interaction: 
+  Implement gesture detection (using a UIKit-based gesture recognizer) and integrate it into SwiftUI to drive animations.
+
+
+## Getting Started
+
+### Prerequisites
+
+- **Xcode 14 or later:**  
+  Make sure you have the latest version of Xcode installed.
+
+- **iOS 16 or later:**  
+  The project uses SwiftUI and Metal features available on newer versions of iOS.
+
+### Setup
 
 1. Clone the Repository:
    ```bash
-   git clone https://github.com/yourusername/MeshArt.git
+   git clone https://github.com/yourusername/MetalRipples.git
+   cd MetalRipples
    ```
+2. Open the Project: Open `MetalRipples.xcodeproj` in Xcode.
+3. Build and Run: Select a simulator or a physical device and press **Cmd + R** to build and run the project.
 
-2. Open in Xcode:
-    - Open the `MeshArt.xcodeproj`         
-    - Ensure you are using Xcode 14 or later for full SwiftUI and Metal compatibility.
-        
-3. Run the App:
-    - Select your target device or simulator.
-    - Build and run the project using **Cmd + R** or the Play button.        
+## Code-Along Walkthrough
 
-## Usage
+### 1. Metal Shaders
 
-Once the app is running, navigate through the following views:
-
-- StaticMeshGradientView: See a simple mesh gradient with a 3×3 grid.
+- Stripes.metal:  
+	  Implements a simple shader to display horizontal stripes. The shader calculates a stripe index based on the pixel’s y-position and uses a color array provided by SwiftUI to render each stripe.
+- Ripple.metal: 
+	  Implements the ripple effect by calculating the distance from the touch point, delaying the ripple for pixels further away, and using a sine wave combined with exponential decay to generate the ripple’s displacement. The shader then samples a new pixel position based on this calculation and subtly adjusts the pixel’s color to enhance the effect.
     
-- PrideView: Display large text ("Pride") styled with pride flag stripes using a mesh gradient.
+
+### 2. SwiftUI Integration
+
+- RippleModifier.swift: 
+    A view modifier that bridges the animation timing with the Metal shader. It passes the current touch location (`origin`), elapsed time, and ripple parameters (amplitude, frequency, decay, speed) to the Metal shader to compute the visual effect.
     
-- DraggableMeshView: Interactively drag the control points of the mesh gradient. Use the toolbar buttons to:
-    - **Reset** the grid to its initial positions.
-    - **Toggle** the color pickers for changing the top, middle, and bottom gradient colors.
-        
+- RippleEffect.swift:
+    Orchestrates the ripple animation by applying a keyframe animator. It listens for changes (via a trigger such as a counter) and starts the animation that updates the elapsed time, feeding these values into the `RippleModifier`.
+    
+- SpatialPressing.swift:
+    Contains the custom gesture recognizer (`SpatialPressingGesture`) built on UIKit and a SwiftUI view modifier (`SpatialPressingGestureModifier`) that captures the touch location and updates the view’s state. This location is used to set the ripple’s origin.
+    
+- RippleEffectView.swift:
+    Combines everything by displaying an image and attaching the custom gesture modifier to capture user taps. When a tap is detected, it updates the origin and triggers the ripple animation using the `RippleEffect` modifier.
+    
+
+### 3. Putting It All Together
+
+The final UI is built using a `TabView` in `ContentView.swift`, which allows you to switch between the Stripes view and the Ripple effect view. This demonstrates how multiple Metal shaders and effects can coexist in a single app.
+
+## Resources
+
+- [Apple Developer Documentation - SwiftUI Visual Effects](https://developer.apple.com/documentation/SwiftUI/Creating-visual-effects-with-SwiftUI)
+    
+- [Metal Shading Language Guide](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf)
     
 
 ## License
 
-MeshArt is available under the [MIT License](LICENSE).
-
-## Acknowledgements
-
-- **WWDC24 Inspiration:** This project is inspired by Apple’s WWDC24 talk on creating custom visual effects with SwiftUI.
-    
-- **Apple Developer Documentation:** Many thanks to Apple for the detailed documentation on SwiftUI, Metal, and view modifiers.
-    
+This project is licensed under the MIT License. See the LICENSE file for details.
 
 ---
 
-**Stay hungry. Stay foolish.**  
-— _Steve Jobs_
+Happy coding! Let your creativity and curiosity drive you to explore more of what Metal and SwiftUI can do.
